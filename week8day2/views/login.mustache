@@ -1,0 +1,19 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+    <body>
+        {{menu}}
+        <h1>log in</h1>
+        {{alert}}
+            <form id= "login"action = "/login" method = "POST">
+                <label for="username">Username:</label>
+                <input id = "username"type = "text" name = "username"/>
+                <label for="password">password:</label>
+                <input id = "password" type = "password" name = "password"/>
+                <input type = "submit" value = "log in">
+        </form>
+        <a href = "/signup">sign up</a>
+    </body>
+</html>

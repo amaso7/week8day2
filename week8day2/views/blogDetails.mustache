@@ -1,0 +1,24 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {{#menu}}
+    <h1>Blog post</h1>
+    <h2>{{title}}</h2>
+    <h3>Author:</h3>
+    <h4>Date Posted: {{datePosted}}</h4>
+    <p>{{postText}}</p>
+    <h3>Comments</h3>
+    {{#comments}}
+    <span>{{commentForm}}</span><span>{{datePosted}}</span>
+    <p>{{commentText}}</p>
+    {{/comments}}
+    <form id= "commentform" action="/blog/{{postid}}/commentblog/"method = "POST">
+        <textarea id = "comment-text" rows= "3" cols= "50" name= "commentText">
+        </textarea>
+        <input type = "submit" value = "Comment"/>
+    </form>
+</body>
+</html>
