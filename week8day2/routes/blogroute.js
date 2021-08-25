@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     let userid = req.session.userid
-    let posts =  db.any('SELECT postid, title, author, dateposted, posttext FROM posts WHERE userid = $1 ORDER BY dateposted DESC', [userid])
+    let posts = await db.any('SELECT postid, title, author, dateposted, posttext FROM posts WHERE userid = $1 ORDER BY dateposted DESC', [userid])
     res.render('blog', {posts: posts})
 })
 
@@ -19,19 +19,19 @@ router.post('/addblog', async (req, res) => {
     let postAuthor = req.body.postAuthor
     let postText = req.body.postText
     let userid = req.session.userid
-    let updatedpost =  db.none('INSERT INTO posts(title, author, posttext, userid) VALUES($1, $2, $3, $4)', [postTitle, postAuthor, postText, userid])
+    let updatedpost = await db.none('INSERT INTO posts(title, author, posttext, userid) VALUES($1, $2, $3, $4)', [postTitle, postAuthor, postText, userid])
     res.redirect('/blog')
 })
 
 router.get('/viewall', async (req, res) => {
-    let posts =  db.any('SELECT posts.postid, posts.title, posts.author, posts.dateposted, posts.posttext, COUNT(comments.commentid) as commentcount FROM posts LEFT OUTER JOIN comments ON posts.postid = comments.postid GROUP BY posts.postid ORDER BY posts.dateposted DESC')
+    let posts = await db.any('SELECT posts.postid, posts.title, posts.author, posts.dateposted, posts.posttext, COUNT(comments.commentid) as commentcount FROM posts LEFT OUTER JOIN comments ON posts.postid = comments.postid GROUP BY posts.postid ORDER BY posts.dateposted DESC')
    
     res.render('viewall', {posts: posts})
 })
 
 router.get('/:id/updateblog', async (req, res) => {
     let postId = req.params.id
-    let posts =  db.any('SELECT postid, title, author, dateposted, posttext FROM posts WHERE postid = $1', [postId])
+    let posts = await db.any('SELECT postid, title, author, dateposted, posttext FROM posts WHERE postid = $1', [postId])
     res.render('updateBlog', {posts: posts})
 })
 
@@ -41,7 +41,7 @@ router.post('/:id/updateblog/update', async (req, res) => {
     let postAuthor = req.body.postAuthor
     
     let postText = req.body.postText
-    let posts =  db.none('UPDATE posts SET title = $1, author = $2, posttext = $3 WHERE postid = $4', [postTitle, postAuthor, postText, postId])
+    let posts = await db.none('UPDATE posts SET title = $1, author = $2, posttext = $3 WHERE postid = $4', [postTitle, postAuthor, postText, postId])
     res.redirect('/blog')
 })
 

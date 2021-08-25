@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const mustacheExpress = require('mustache-express')
 const session = require('express-session')
+global.users=[]
 const User = require('./models/users')
 const Post = require('./models/posts')
 const blogRouter = require('./routes/blogroute.js')
@@ -13,8 +14,8 @@ const VIEWS_PATH = path.join(__dirname, 'views')
 var bcrypt = require('bcryptjs')
 
 const pgp = require('pg-promise')()
-const connectionString = 'postgres://localhost:postgres:vhfwlctz:la3sZCVqlKX83Lp7T68SChFV6zo3V1q_@chunee.db.elephantsql.com:5432/vhfwlctz'
-const db = pgp(connectionString)
+const connectionString = 'postgres://vhfwlctz:la3sZCVqlKX83Lp7T68SChFV6zo3V1q_@chunee.db.elephantsql.com/vhfwlctz'
+global.db = pgp(connectionString)
 
 app.use(session({
     secret: 'mdhf888',
@@ -48,9 +49,9 @@ app.post('/login', async (req, res)=>{
         let username = req.body.username
         let password = req.body.password
 
-        let validatedUsername =  db.oneOrNone('SELECT userid, username, password FROM users WHERE username = $1', [username])
+        let validatedUsername = await db.oneOrNone('SELECT userid, username, password FROM users WHERE username = $1', [username])
         if(validatedUsername) {
-            let validatedPassword =  bcrypt.compare(password, validatedUsername.password)
+            let validatedPassword = await bcrypt.compare(password, validatedUsername.password)
             if(validatedPassword) {
                 req.session.userid = validatedUsername.userid
                 req.session.username = username
@@ -68,17 +69,17 @@ app.post('/login', async (req, res)=>{
         res.render('signup')
     })
     
-    app.post('/signup', (req, res) => {
+    app.post('/signup', async (req, res) => {
         let username = req.body.username
         let password = req.body.password
    
     
-        let existingUsername = db.oneOrNone('Select username FROM users WHERE username = $1', [username])
+        let existingUsername = await db.oneOrNone('Select username FROM users WHERE username = $1', [username])
     
         if (!existingUsername) {
-            let hash =   bcrypt.hash(password, 10)
-            let updatedpost = db.none('INSERT INTO users(username, password) VALUES($1, $2)', [username, hash])
-            let useridObject = db.one('Select userid FROM users WHERE username = $1', [username])
+            let hash =  await bcrypt.hash(password, 10)
+            let updatedpost = await db.none('INSERT INTO users(username, password) VALUES($1, $2)', [username, hash])
+            let useridObject =await  db.one('Select userid FROM users WHERE username = $1', [username])
             let userid = useridObject.userid
             if (req.session) {
                 req.session.userid = userid
@@ -103,8 +104,8 @@ app.post('/login', async (req, res)=>{
         }
     })
     
+    console.log(process.env.SECRET)
     
-    
-    app.listen(PORT, () => {
+    app.listen(3000, () => {
         console.log('Server has started...')
     })
